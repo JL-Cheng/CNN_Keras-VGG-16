@@ -6,17 +6,11 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import tensorflow as tf
 import CNN_model as model
-#from model_training import IMG_W,IMG_H
 
 def get_one_image(img_dir):
     image=Image.open(img_dir)
-    #处理打开的图像
-    plt.figure(num='test picture window')
-    plt.title('test picture')
-    plt.imshow(image)
     image=image.resize([400,300])
     image_arr = np.array(image)
-    plt.axis('off')
 
     return image_arr
 
@@ -59,13 +53,7 @@ def test():
         for line in images_cat.readlines():
             image_name=line.strip('\n')
             image_array=get_one_image(images_dir+image_name)
-
-            #image_m=tf.cast(image_array,tf.float32)
-            #image_m=tf.image.per_image_standardization(image_m)
             image_array=np.reshape(image_array,[1,300,400,3])                 
-            #p=model.inference(image_m,1,10)
-            #logits=tf.nn.softmax(p)
-            #x=tf.placeholder(tf.float32,shape=[300,400,3])
   
             prediction=sess.run(logits,feed_dict={x:image_array})
             prediction=np.array(prediction,dtype='float32')

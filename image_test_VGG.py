@@ -1,18 +1,28 @@
 # coding=gbk
 
-import os
-import numpy as np
+from keras.layers import Input
+from keras.layers import Flatten
+from keras.layers import Dense
+from keras.layers import Dropout
+from keras.models import Model
+from keras.models import Sequential
+from keras.models import load_model
+from keras import backend
+
 import matplotlib.pyplot as plt
 from PIL import Image
+import h5py as h5py
+import numpy as np
 import tensorflow as tf
-import CNN_model as model
 
 def get_one_image(img_dir):
+    x=[]
     image=Image.open(img_dir)
     image=image.resize([400,300])
-    image_arr = np.array(image)
+    x.append(np.array(image))
+    x=np.array(x)
 
-    return image_arr
+    return x
 
 def images_show(images):
     images_dir='./image/image/'
@@ -28,50 +38,36 @@ def images_show(images):
     
 def test():
     images_dir='./image/image/'
-    log_dir='./log/'
+    log_dir="./VGG_log/VGG_model.h5"
 
     images_cat=open("imagelist.txt")
     #保存所有图像经过模型计算之后的数组
-    images_tested=[]#[] for i in range(2)
+    images_tested=[]
 
-    with tf.Graph().as_default():
-        #重载模型
-        x=tf.placeholder(tf.float32,shape=[1,300,400,3])
-        p=model.inference(x,1,10)
-        logits=tf.nn.softmax(p)
+    #重载模型
+    model = load_model(log_dir)
 
-        sess=tf.Session()
-        tf.get_variable_scope().reuse_variables()
-        ckpt=tf.train.get_checkpoint_state(log_dir)
-        saver=tf.train.Saver()
-        if ckpt and ckpt.model_checkpoint_path:
-            global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-            saver.restore(sess, ckpt.model_checkpoint_path)
-            print('Loading success!')
-        else:
-            print('Loading failed!')
-        for line in images_cat.readlines():
-            image_name=line.strip('\n')
-            image_array=get_one_image(images_dir+image_name)
-            image_array=np.reshape(image_array,[1,300,400,3])                 
+    for line in images_cat.readlines():
+        image_name=line.strip('\n')
+        image_array=get_one_image(images_dir+image_name)               
   
-            prediction=sess.run(logits,feed_dict={x:image_array})
-            prediction=np.array(prediction,dtype='float32')
-            images_tested.append([image_name,prediction])
+        prediction=model.predict(image_array)
+        prediction=np.array(prediction,dtype='float32')
+        images_tested.append([image_name,prediction])
 
-            print(image_name)
-            print(prediction)
+        print(image_name)
+        print(prediction)
         
         #测试单张图片
-        while (True):
+    while (True):
             test_file=input('输入测试图片:')
             if(test_file=='z'):
                 break
 
             image_name=test_file
             image_array=get_one_image(images_dir+image_name)
-            image_array=np.reshape(image_array,[1,300,400,3])
-            prediction=sess.run(logits,feed_dict={x:image_array})
+
+            prediction=model.predict(image_array)
             prediction=np.array(prediction,dtype='float32')
             test_result=[]
             for sample in images_tested:
@@ -79,7 +75,7 @@ def test():
                 distance.astype('float32')
                 test_result.append([sample[0],distance])
                                 
-            #将结果逆序排序
+            #将结果排序
             test_result=np.array(test_result)
             test_result=test_result[np.lexsort(test_result.T)]
             for i in range(10):

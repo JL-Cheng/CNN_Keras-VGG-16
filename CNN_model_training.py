@@ -14,7 +14,7 @@ IMG_W=400
 IMG_H=300
 
 BATCH_SIZE=8
-CAPACITY=64
+CAPACITY=4096
 
 #最大迭代次数
 MAX_STEP=1000
@@ -61,7 +61,7 @@ def run_training():
             
             #每迭代50次打印一次结果
             if step%50 == 0:
-                print('Step %d,train loss = %.2f,train occuracy = %.2f'%(step,temp_loss,temp_acc))
+                print('Step %d,train loss = %.2f,train accuracy = %.2f'%(step,temp_loss,temp_acc))
                 summary_str=sess.run(summary_op)
                 train_writer.add_summary(summary_str,step)
             

@@ -1,5 +1,5 @@
-# CNN_ImageRetrieval & Keras-VGG-16 
-CNN model based on tensorflow/Modified VGG-16 model based on Keras for image classification and retrieval.
+# CNN & Keras-VGG-16 
+CNN model based on tensorflow and Modified 'VGG-16' model based on Keras for image classification and retrieval.
 ## 功能说明
 1、CNN_model.py中实现了一个2卷积层、2池化层和2全连接层的神经网络，并最后通过sigmoid函数做归一化处理。<br>
 2、image_preprocessing.py中进行了图片预处理。<br>
